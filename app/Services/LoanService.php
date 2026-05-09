@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Loan;
 use App\Models\Asset;
+use App\Enums\AssetStatus;
+use App\Enums\Condition;
 use Illuminate\Support\Facades\DB;
 use App\Exceptions\DuplicateAssetTypeLoanException;
 
@@ -37,7 +39,7 @@ class LoanService
             |--------------------------------------------------------------------------
             */
 
-            if ($asset->status !== 'available') {
+            if ($asset->status !== AssetStatus::AVAILABLE) {
 
                 throw new \Exception(
                     'Asset is not available for loan.'
@@ -72,6 +74,10 @@ class LoanService
                 throw new DuplicateAssetTypeLoanException();
             }
 
+            if ($conditionAtCheckout !== null) {
+                $conditionAtCheckout = Condition::from($conditionAtCheckout);
+            }
+
             /*
             |--------------------------------------------------------------------------
             | Create Loan
@@ -92,7 +98,7 @@ class LoanService
             */
 
             $asset->update([
-                'status' => 'borrowed'
+                'status' => AssetStatus::BORROWED,
             ]);
 
             return $loan;

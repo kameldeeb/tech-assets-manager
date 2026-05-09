@@ -20,4 +20,21 @@ public function department()
 {
     return $this->belongsTo(Department::class);
 }
+
+public function scopeIntenseUsers($query)
+{
+    return $query->whereHas(
+        'loans',
+        function ($q) {
+
+            $q->where(
+                'borrowed_at',
+                '>=',
+                now()->subMonths(6)
+            );
+        },
+        '>',
+        3
+    );
+}
 }
