@@ -7,4 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Branch extends Model
 {
     //
+    public function departments()
+{
+    return $this->hasMany(Department::class);
+}
+
+public function employees()
+{
+    return $this->hasMany(Employee::class);
+}
 }
