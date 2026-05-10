@@ -90,31 +90,49 @@
     </div>
 
     <!-- Flash Notifications -->
-    <div x-data="notifications({!! json_encode(['show' => session('success') || session('error'), 'type' => session('success') ? 'success' : 'error', 'message' => session('success') ?: session('error')]) !!})" x-show="show" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="transform translate-x-full opacity-0" x-transition:enter-end="transform translate-x-0 opacity-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="transform translate-x-0 opacity-100" x-transition:leave-end="transform translate-x-full opacity-0" class="fixed top-4 right-4 z-50 max-w-sm w-full">
-        <div :class="type === 'success' ? 'bg-green-800 border-green-700' : 'bg-red-800 border-red-700'" class="bg-green-800 border border-green-700 text-white px-4 py-3 rounded-lg shadow-lg">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <svg x-show="type === 'success'" class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    <div x-data="{ 
+            show: {{ session('success') || session('error') ? 'true' : 'false' }},
+            message: '{{ session('success') ?: session('error') }}',
+            type: '{{ session('success') ? 'success' : 'error' }}'
+        }"
+        x-init="if(show) setTimeout(() => show = false, 5000)"
+        x-show="show"
+        x-cloak
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="transform translate-x-full opacity-0"
+        x-transition:enter-end="transform translate-x-0 opacity-100"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="transform translate-x-0 opacity-100"
+        x-transition:leave-end="transform translate-x-full opacity-0"
+        class="fixed top-5 right-5 z-[100] max-w-sm w-full">
+        
+        <div :class="type === 'success' ? 'bg-slate-800 border-green-500 shadow-green-500/20' : 'bg-slate-800 border-blue-500 shadow-blue-500/20'" 
+            class="border-2 p-4 shadow-2xl rounded-2xl flex items-center glass-card transition-all duration-500 ring-1 ring-white/10 ring-inset">
+                    
+            <div class="flex-shrink-0">
+                <template x-if="type === 'success'">
+                    <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <svg x-show="type === 'error'" class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </template>
+                <template x-if="type === 'error'">
+                    <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm font-medium" x-text="message"></p>
-                </div>
-                <div class="ml-auto pl-3">
-                    <button @click="close" class="inline-flex rounded-md p-1.5 text-green-400 hover:text-green-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
+                </template>
             </div>
+
+            <div class="ml-3 flex-1">
+                <p class="text-sm font-bold text-slate-100" x-text="message"></p>
+            </div>
+            
+            <button @click="show = false" class="ml-4 text-slate-500 hover:text-slate-300">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
         </div>
     </div>
-
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('app', () => ({

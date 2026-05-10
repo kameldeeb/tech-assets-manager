@@ -44,7 +44,12 @@
     <div class="bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-700 glass-card transition-all duration-300">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-slate-100">Stale Assets</h3>
-            <span class="text-[10px] font-bold px-2 py-1 bg-amber-900/30 text-amber-400 rounded-full uppercase tracking-tighter">Oldest First</span>
+            <a href="/api/reports/stale-assets" target="_blank" class="inline-flex items-center px-3 py-2 border border-slate-600 rounded-lg text-sm font-medium text-slate-300 bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                </svg>
+                JSON
+            </a>
         </div>
         
         <p class="text-sm text-slate-400 mb-4">Assets idle for over a year, sorted by longest duration in stock.</p>

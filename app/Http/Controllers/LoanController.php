@@ -22,10 +22,13 @@ class LoanController extends Controller
             );
 
             return redirect()->back()
-                ->with('success', 'Loan created successfully.');
+                ->with('success', 'Asset has been successfully assigned to the employee.');
         } catch (DuplicateAssetTypeLoanException $exception) {
             return redirect()->back()
-                ->with('error', $exception->getMessage());
+                ->with('error', 'This employee already has an active loan for this type of asset.');
+        } catch (\Throwable $exception) {
+            return redirect()->back()
+                ->with('error', 'Assignment failed: ' . $exception->getMessage());
         }
     }
 }
