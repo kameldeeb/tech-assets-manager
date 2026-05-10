@@ -51,36 +51,32 @@ The **Asset Manager - Hope Center** is a sophisticated web application designed 
 
 ### Step-by-Step Setup
 
-1. **Clone the Repository**
+1. **Clone & Install Dependencies**
    ```bash
    git clone https://github.com/kameldeeb/tech-assets-manager.git
    cd tech-assets-manager
-   ```
-
-2. **Install PHP Dependencies**
-   ```bash
    composer install
+   npm install
    ```
 
-3. **Environment Configuration**
+2. **Environment Setup**
    ```bash
    cp .env.example .env
-   # Edit .env with your database credentials
+   php artisan key:generate
+   # Configure your DB_DATABASE, DB_USERNAME, DB_PASSWORD in .env
    ```
 
-4. **Database Setup**
+3. **Database & Assets**
    ```bash
-   php artisan migrate:fresh --seed
+   php artisan migrate --seed
+   npm run build
    ```
 
-5. **Start the Development Server**
+4. **Run Application**
    ```bash
    php artisan serve
    ```
-
-6. **Access the Application**
-   - Open your browser and navigate to `http://localhost:8000`
-   - Login with the demo credentials below
+   Open `http://localhost:8000`
 
 ---
 
