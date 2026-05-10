@@ -3,19 +3,18 @@
 namespace App\Services;
 
 use App\Models\Loan;
+use App\Models\Inspection;
 use Illuminate\Support\Facades\DB;
 use App\Exceptions\InvalidReturnOperationException;
 
 class ReturnService
 {
     public function processReturn(
-        int $loanId,
-        ?string $conditionAtReturn = null
+        int $loanId
     ): Loan {
 
         return DB::transaction(function () use (
-            $loanId,
-            $conditionAtReturn
+            $loanId
         ) {
 
             /*
@@ -47,7 +46,6 @@ class ReturnService
 
             $loan->update([
                 'returned_at' => now(),
-                'condition_at_return' => $conditionAtReturn,
             ]);
 
             /*
@@ -58,6 +56,18 @@ class ReturnService
 
             $loan->asset->update([
                 'status' => 'under_inspection'
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Create Inspection Record
+            |--------------------------------------------------------------------------
+            */
+
+            Inspection::create([
+                'asset_id' => $loan->asset_id,
+                'loan_id' => $loan->id,
+                'inspected_by' => null, // Will be set when inspected
             ]);
 
             return $loan->fresh();

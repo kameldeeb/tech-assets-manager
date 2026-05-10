@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\DuplicateAssetTypeLoanException;
-use App\Services\LoanService;
 use App\Http\Requests\StoreLoanRequest;
+use App\Services\LoanService;
+use Illuminate\Http\RedirectResponse;
 
 class LoanController extends Controller
 {
     public function store(
         StoreLoanRequest $request,
         LoanService $loanService
-    ) {
+    ): RedirectResponse {
 
         try {
             $loanService->issueLoan(
@@ -24,7 +25,7 @@ class LoanController extends Controller
                 ->with('success', 'Loan created successfully.');
         } catch (DuplicateAssetTypeLoanException $exception) {
             return redirect()->back()
-                ->withErrors(['employee_id' => $exception->getMessage()]);
+                ->with('error', $exception->getMessage());
         }
     }
 }

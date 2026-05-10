@@ -34,6 +34,11 @@ Route::middleware('auth')->group(function () {
         'store'
     ]);
 
+    Route::post('/inspections/{inspection}/update', [
+        InspectionController::class,
+        'update'
+    ])->name('inspections.update');
+
     Route::get('/reports/stagnant-assets', [
         ReportController::class,
         'idleAssets'

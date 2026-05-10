@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
 use App\Enums\AssetStatus;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Asset extends Model
 {
@@ -20,33 +22,34 @@ class Asset extends Model
         'status' => AssetStatus::class,
     ];
 
-    public function assetType()
+    public function assetType(): BelongsTo
     {
         return $this->belongsTo(AssetType::class);
     }
-    
-    public function loans()
+
+    public function loans(): HasMany
     {
         return $this->hasMany(Loan::class);
     }
 
-    public function inspections()
+    public function inspections(): HasMany
     {
         return $this->hasMany(Inspection::class);
     }
 
-    public function scopeIdle($query)
+    public function scopeIdle(Builder $query): Builder
     {
-        return $query->whereDoesntHave('loans', function ($q) {
-            $q->where(
-                'borrowed_at',
-                '>=',
-                now()->subYear()
-            );
+        return $query->whereDoesntHave('loans', function (Builder $query) {
+            $query->where('borrowed_at', '>=', now()->subYear());
         });
     }
 
-    public function getDaysInStockAttribute()
+    public function isAvailable(): bool
+    {
+        return $this->status === AssetStatus::AVAILABLE;
+    }
+
+    public function getDaysInStockAttribute(): ?int
     {
         $lastLoan = $this->loans()
             ->orderByDesc('borrowed_at')
@@ -57,5 +60,24 @@ class Asset extends Model
         return $referenceDate
             ? $referenceDate->diffInDays(now())
             : null;
+    }
+
+    /**
+     * Convert days_in_stock into a human-readable format (Years, Months, Days).
+     * This can be used globally across all reports.
+     */
+    public function getIdleDurationAttribute(): array
+    {
+        $days = $this->days_in_stock;
+
+        if (! $days) {
+            return ['d' => 0];
+        }
+
+        return [
+            'y' => floor($days / 365),
+            'm' => floor(($days % 365) / 30),
+            'd' => ($days % 365) % 30,
+        ];
     }
 }

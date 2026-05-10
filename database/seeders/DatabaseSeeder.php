@@ -10,6 +10,7 @@ use App\Models\Employee;
 use App\Models\AssetType;
 use App\Models\Asset;
 use App\Models\Loan;
+use App\Models\Inspection;
 use App\Enums\AssetStatus;
 use App\Enums\Condition;
 
@@ -158,6 +159,19 @@ class DatabaseSeeder extends Seeder
             } else {
                 $data['asset']->update(['status' => AssetStatus::AVAILABLE]);
             }
+        }
+
+        // Create inspections for some returned assets
+        $returnedLoans = Loan::whereNotNull('returned_at')->get();
+        $inspectionLoans = $returnedLoans->take(5); // First 5 returned loans
+
+        foreach ($inspectionLoans as $loan) {
+            $loan->asset->update(['status' => AssetStatus::UNDER_INSPECTION]);
+            Inspection::create([
+                'asset_id' => $loan->asset_id,
+                'loan_id' => $loan->id,
+                'inspected_by' => null,
+            ]);
         }
     }
 }

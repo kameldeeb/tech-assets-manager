@@ -13,12 +13,16 @@ class ReturnController extends Controller
         int $loanId
     ) {
 
-        $returnService->processReturn(
-            loanId: $loanId,
-            conditionAtReturn: $request->condition_at_return
-        );
+        try {
+            $returnService->processReturn(
+                loanId: $loanId
+            );
 
-        return redirect()->back()
-            ->with('success', 'Asset returned successfully.');
+            return redirect()->back()
+                ->with('success', 'Asset returned successfully and sent for inspection.');
+        } catch (\Exception $exception) {
+            return redirect()->back()
+                ->with('error', 'Failed to return asset: ' . $exception->getMessage());
+        }
     }
 }

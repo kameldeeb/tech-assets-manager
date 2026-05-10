@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-slate-400">Total Assets</p>
-                <p class="text-3xl font-bold text-slate-100">{{ $availableAssets->count() + $borrowedAssets + $underInspectionAssets }}</p>
+                <p class="text-3xl font-bold text-slate-100">{{ $totalAssets }}</p>
             </div>
             <div class="w-12 h-12 bg-blue-900/50 rounded-lg flex items-center justify-center">
                 <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
