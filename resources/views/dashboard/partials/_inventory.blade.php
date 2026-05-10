@@ -17,15 +17,44 @@
         <table class="min-w-full divide-y divide-slate-700">
             <thead class="bg-slate-700">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Asset Type</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Serial Number</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Purchase Date</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">Days in Stock</th>
+                    @php
+                        $currentSort = request('sort', 'serial_number');
+                        $currentDirection = request('direction', 'asc');
+                        $columns = [
+                            'asset_type' => 'Asset Type',
+                            'serial_number' => 'Serial Number',
+                            'status' => 'Status',
+                            'purchase_date' => 'Purchase Date',
+                            'days_in_stock' => 'Days in Stock'
+                        ];
+                    @endphp
+                    @foreach($columns as $column => $label)
+                        @php
+                            $isCurrent = $currentSort === $column;
+                            $nextDirection = $isCurrent && $currentDirection === 'asc' ? 'desc' : 'asc';
+                            $url = request()->fullUrlWithQuery(['sort' => $column, 'direction' => $nextDirection]);
+                        @endphp
+                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
+                            <a href="{{ $url }}" class="flex items-center hover:text-slate-100 transition">
+                                {{ $label }}
+                                @if($isCurrent)
+                                    @if($currentDirection === 'asc')
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    @endif
+                                @endif
+                            </a>
+                        </th>
+                    @endforeach
                 </tr>
             </thead>
             <tbody class="bg-slate-800 divide-y divide-slate-700">
-                @foreach($stagnantAssets as $asset)
+                @foreach($allAssets as $asset)
                     <tr class="hover:bg-slate-700 transition">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100">{{ $asset->assetType->name ?? 'Unknown' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-100">{{ $asset->serial_number }}</td>

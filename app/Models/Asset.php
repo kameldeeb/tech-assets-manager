@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AssetStatus;
+use App\Enums\Condition;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,11 +16,13 @@ class Asset extends Model
         'serial_number',
         'purchase_date',
         'status',
+        'condition',
     ];
 
     protected $casts = [
         'purchase_date' => 'date',
         'status' => AssetStatus::class,
+        'condition' => Condition::class,
     ];
 
     public function assetType(): BelongsTo
@@ -51,14 +54,8 @@ class Asset extends Model
 
     public function getDaysInStockAttribute(): ?int
     {
-        $lastLoan = $this->loans()
-            ->orderByDesc('borrowed_at')
-            ->first();
-
-        $referenceDate = optional($lastLoan)->returned_at ?? $this->purchase_date;
-
-        return $referenceDate
-            ? $referenceDate->diffInDays(now())
+        return $this->purchase_date
+            ? $this->purchase_date->diffInDays(now())
             : null;
     }
 

@@ -69,6 +69,7 @@ class ReturnService
                 'asset_id' => $loan->asset_id,
                 'loan_id' => $loan->id,
                 'inspected_by' => null, // Will be set when inspected
+                'result' => 'pending', 
             ]);
 
             return $loan->fresh();
