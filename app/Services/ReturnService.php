@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Loan;
 use App\Models\Inspection;
+use App\Enums\AssetStatus;
 use Illuminate\Support\Facades\DB;
 use App\Exceptions\InvalidReturnOperationException;
 
@@ -55,7 +56,7 @@ class ReturnService
             */
 
             $loan->asset->update([
-                'status' => 'under_inspection'
+                'status' => AssetStatus::UNDER_INSPECTION
             ]);
 
             /*

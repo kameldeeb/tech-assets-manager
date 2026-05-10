@@ -4,18 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Services\ReturnService;
 use App\Http\Requests\ReturnLoanRequest;
+use App\Models\Loan;
+use Illuminate\Http\RedirectResponse;
 
 class ReturnController extends Controller
 {
     public function store(
         ReturnLoanRequest $request,
         ReturnService $returnService,
-        int $loanId
-    ) {
+        Loan $loanId
+    ): RedirectResponse {
 
         try {
             $returnService->processReturn(
-                loanId: $loanId
+                loanId: $loanId->id
             );
 
             return redirect()->back()

@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Condition;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\In;
 
 class StoreLoanRequest extends FormRequest
 {
@@ -23,9 +25,9 @@ class StoreLoanRequest extends FormRequest
     public function rules(): array
     {
         return [
-        'employee_id' => ['required', 'exists:employees,id'],
-        'asset_id' => ['required', 'exists:assets,id'],
-        'condition_at_checkout' => ['nullable', 'string'],
+            'employee_id' => ['required', 'exists:employees,id'],
+            'asset_id' => ['required', 'exists:assets,id'],
+            'condition_at_checkout' => ['nullable', new In(Condition::values())],
         ];
     }
 }

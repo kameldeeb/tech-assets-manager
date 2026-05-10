@@ -10,13 +10,14 @@ use App\Enums\Condition;
 use App\Enums\AssetStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\Rules\In;
 
 class InspectionController extends Controller
 {
     public function store(
         CompleteInspectionRequest $request,
         InspectionService $inspectionService
-    ) {
+    ): RedirectResponse {
 
         $inspectionService->completeInspection(
             assetId: $request->asset_id,
@@ -33,8 +34,8 @@ class InspectionController extends Controller
     public function update(Request $request, Inspection $inspection): RedirectResponse
     {
         $request->validate([
-            'condition' => 'required',
-            'status' => 'required',
+            'condition' => ['required', new In(Condition::values())],
+            'status' => ['required', new In(AssetStatus::values())],
         ]);
 
         try {
