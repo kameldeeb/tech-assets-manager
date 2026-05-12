@@ -52,7 +52,7 @@
             </a>
         </div>
         
-        <p class="text-sm text-slate-400 mb-4">Assets idle for over a year, sorted by longest duration in stock.</p>
+        <p class="text-sm text-slate-400 mb-4">Assets idle for over 6 months.</p>
 
         @if($stagnantAssets->isEmpty())
             <div class="text-center py-8">
