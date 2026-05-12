@@ -14,60 +14,48 @@ use Illuminate\Validation\Rules\In;
 
 class InspectionController extends Controller
 {
-    public function store(
-        CompleteInspectionRequest $request,
-        InspectionService $inspectionService
-    ): RedirectResponse {
+ public function update(Request $request, Inspection $inspection): RedirectResponse
+{
+    $request->validate([
+        'condition' => ['required', 'string'], // سيتم التحقق منها تلقائياً عند الحفظ بفضل الـ Casts في الموديل
+        'status' => ['required', 'string'],
+        'notes' => ['nullable', 'string', 'max:1000'], // أضفنا التحقق للملاحظات
+    ]);
 
-        $inspectionService->completeInspection(
-            assetId: $request->asset_id,
-            loanId: $request->loan_id,
-            inspectorId: auth()->id(),
-            result: $request->result,
-            notes: $request->notes
-        );
+    try {
+        \DB::beginTransaction();
 
-        return redirect()->back()
-            ->with('success', 'Inspection completed successfully.');
-    }
+        $conditionValue = $request->input('condition');
+        $statusValue = $request->input('status');
+        $notesValue = $request->input('notes');
 
-    public function update(Request $request, Inspection $inspection): RedirectResponse
-    {
-        $request->validate([
-            'condition' => ['required', new In(Condition::values())],
-            'status' => ['required', new In(AssetStatus::values())],
+        $asset = $inspection->asset;
+        if ($asset) {
+            $asset->update([
+                'condition' => $conditionValue,
+                'status' => $statusValue,
+            ]);
+        }
+
+        $inspection->update([
+            'verified_condition' => $conditionValue,
+            'new_status' => $statusValue,
+            'notes' => $notesValue, // حفظ الملاحظات هنا
+            'completed_at' => now(),
+            'inspected_at' => now(), // أضفنا تاريخ الفحص الفعلي
+            'inspected_by' => auth()->id(), 
         ]);
 
-        try {
-            \DB::beginTransaction(); // استخدام Transaction لضمان تنفيذ كل العمليات أو إلغائها معاً
+        \DB::commit();
 
-            $conditionValue = $request->input('condition');
-            $statusValue = $request->input('status');
+        return redirect()->route('dashboard')
+            ->with('success', 'Asset verified as ' . $conditionValue . ' and set to ' . $statusValue);
 
-            $asset = $inspection->asset;
-            if ($asset) {
-                $asset->update([
-                    'condition' => $conditionValue,
-                    'status' => $statusValue,
-                ]);
-            }
-
-            $inspection->update([
-                'verified_condition' => $conditionValue,
-                'new_status' => $statusValue,
-                'completed_at' => now(),
-                'inspected_by' => auth()->id() ?? 1, // إسناد المفتش لتجنب خطأ الـ Null
-            ]);
-
-            \DB::commit();
-
-            return redirect()->route('dashboard')
-                ->with('success', 'Asset verification completed and asset is now ' . $statusValue);
-
-        } catch (\Exception $exception) {
-            \DB::rollBack();
-            return redirect()->route('dashboard')
-                ->with('error', 'Critical Error: ' . $exception->getMessage());
-        }
+    } catch (\Exception $exception) {
+        \DB::rollBack();
+        return redirect()->route('dashboard')
+            ->with('error', 'Error updating inspection: ' . $exception->getMessage());
     }
+}
+
 }

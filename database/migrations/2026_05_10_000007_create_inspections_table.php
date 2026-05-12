@@ -23,20 +23,40 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->foreignId('inspected_by')
+                ->nullable()
                 ->constrained('users')
-                ->cascadeOnDelete();
+                ->nullOnDelete();
 
             $table->enum('result', [
+                'pending',
                 'excellent',
                 'good',
                 'damaged',
                 'maintenance_required'
-            ]);
+            ])->default('pending');
+
+            $table->enum('verified_condition', [
+                'excellent',
+                'good',
+                'fair',
+                'needs_repair'
+            ])->nullable();
+
+            $table->enum('new_status', [
+                'available',
+                'borrowed',
+                'under_inspection',
+                'damaged'
+            ])->nullable();
 
             $table->text('notes')
                 ->nullable();
 
-            $table->timestamp('inspected_at');
+            $table->timestamp('inspected_at')
+                ->nullable();
+
+            $table->timestamp('completed_at')
+                ->nullable();
 
             $table->timestamps();
         });

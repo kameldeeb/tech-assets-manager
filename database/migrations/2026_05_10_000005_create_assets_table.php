@@ -27,14 +27,19 @@ return new class extends Migration
                 'available',
                 'borrowed',
                 'under_inspection',
-                'maintenance',
-                'damaged',
-                'retired'
+                'damaged'
             ])->default('available');
 
-            $table->timestamps();
+            $table->enum('condition', [
+                'excellent',
+                'good',
+                'fair',
+                'needs_repair'
+            ])->default('excellent');
 
+            $table->timestamps();
             $table->softDeletes();
+
 
             /*
             |--------------------------------------------------------------------------

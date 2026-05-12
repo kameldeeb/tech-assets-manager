@@ -48,21 +48,21 @@ class DatabaseSeeder extends Seeder
         // Create 15 employees
         $employees = [];
         $employeeData = [
-            ['name' => 'Kamel Deeb', 'email' => 'kamel@hope.com', 'branch' => $damascus, 'dept' => $itDept],
-            ['name' => 'Nirvana', 'email' => 'nirvana@hope.com', 'branch' => $damascus, 'dept' => $itDept],
-            ['name' => 'Samer Al-Rashid', 'email' => 'samer@hope.com', 'branch' => $damascus, 'dept' => $hrDept],
-            ['name' => 'Jomana Al-Salem', 'email' => 'jomana@hope.com', 'branch' => $aleppo, 'dept' => $financeDept],
-            ['name' => 'Fadi Al-Khoury', 'email' => 'fadi@hope.com', 'branch' => $homs, 'dept' => $operationsDept],
-            ['name' => 'Layla Habib', 'email' => 'layla@hope.com', 'branch' => $damascus, 'dept' => $itDept],
-            ['name' => 'Johnny Haddad', 'email' => 'johnny@hope.com', 'branch' => $aleppo, 'dept' => $financeDept],
-            ['name' => 'Sara Jamal', 'email' => 'sara@hope.com', 'branch' => $homs, 'dept' => $operationsDept],
-            ['name' => 'Rana Al-Sayed', 'email' => 'rana@hope.com', 'branch' => $damascus, 'dept' => $itDept],
-            ['name' => 'Nour Issa', 'email' => 'nour@hope.com', 'branch' => $homs, 'dept' => $operationsDept],
-            ['name' => 'Elias Mansour', 'email' => 'elias@hope.com', 'branch' => $damascus, 'dept' => $hrDept],
-            ['name' => 'Maya Zidan', 'email' => 'maya@hope.com', 'branch' => $aleppo, 'dept' => $financeDept],
-            ['name' => 'George Hanna', 'email' => 'george@hope.com', 'branch' => $homs, 'dept' => $operationsDept],
-            ['name' => 'Zina Haddad', 'email' => 'zina@hope.com', 'branch' => $damascus, 'dept' => $itDept],
-            ['name' => 'Tarek Saloum', 'email' => 'tarek@hope.com', 'branch' => $aleppo, 'dept' => $financeDept],
+            ['name' => 'Kamel Deeb', 'email' => 'kamel@hope.com', 'dept' => $itDept],
+            ['name' => 'Nirvana', 'email' => 'nirvana@hope.com', 'dept' => $itDept],
+            ['name' => 'Samer Al-Rashid', 'email' => 'samer@hope.com', 'dept' => $hrDept],
+            ['name' => 'Jomana Al-Salem', 'email' => 'jomana@hope.com', 'dept' => $financeDept],
+            ['name' => 'Fadi Al-Khoury', 'email' => 'fadi@hope.com', 'dept' => $operationsDept],
+            ['name' => 'Layla Habib', 'email' => 'layla@hope.com', 'dept' => $itDept],
+            ['name' => 'Johnny Haddad', 'email' => 'johnny@hope.com', 'dept' => $financeDept],
+            ['name' => 'Sara Jamal', 'email' => 'sara@hope.com', 'dept' => $operationsDept],
+            ['name' => 'Rana Al-Sayed', 'email' => 'rana@hope.com', 'dept' => $itDept],
+            ['name' => 'Nour Issa', 'email' => 'nour@hope.com', 'dept' => $operationsDept],
+            ['name' => 'Elias Mansour', 'email' => 'elias@hope.com', 'dept' => $hrDept],
+            ['name' => 'Maya Zidan', 'email' => 'maya@hope.com', 'dept' => $financeDept],
+            ['name' => 'George Hanna', 'email' => 'george@hope.com', 'dept' => $operationsDept],
+            ['name' => 'Zina Haddad', 'email' => 'zina@hope.com', 'dept' => $itDept],
+            ['name' => 'Tarek Saloum', 'email' => 'tarek@hope.com', 'dept' => $financeDept],
 
         ];
 
@@ -70,7 +70,6 @@ class DatabaseSeeder extends Seeder
             $employees[] = Employee::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'branch_id' => $data['branch']->id,
                 'department_id' => $data['dept']->id,
             ]);
         }

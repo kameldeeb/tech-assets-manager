@@ -9,11 +9,13 @@ class BranchService
 {
     public function getInventory(): Collection
     {
-        return Loan::with(['asset.assetType', 'employee.branch'])
+        return Loan::with(['asset.assetType', 'employee.department.branch'])
             ->whereNull('returned_at')
             ->where('condition_at_checkout', 'excellent')
             ->get()
-            ->groupBy(fn ($loan) => $loan->employee?->branch->name ?? 'Unassigned')
+            ->groupBy(function ($loan) {
+                return $loan->employee?->department?->branch->name ?? 'Unassigned';
+            })
             ->map(function ($loans, string $branchName) {
                 return [
                     'branch' => $branchName,

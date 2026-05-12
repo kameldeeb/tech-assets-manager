@@ -68,15 +68,49 @@ class DashboardService
             ->get();
     }
 
-    private function getHeavyUsers(): Collection
-    {
-        return Employee::intenseUsers()
-            ->with('branch', 'department')
-            ->withCount(['loans as recent_loans_count' => function ($query) {
-                $query->where('borrowed_at', '>=', now()->subMonths(6));
-            }])
-            ->get();
+private function getHeavyUsers(): Collection
+{
+    // Changed 'branch' to 'department.branch' to follow the new clean structure
+    return Employee::intenseUsers()
+        ->with(['department.branch']) 
+        ->withCount(['loans as recent_loans_count' => function ($query) {
+            $query->where('borrowed_at', '>=', now()->subMonths(6));
+        }])
+        ->get();
+}
+
+private function getAllAssets(): Collection
+{
+    $sort = request('sort', 'serial_number');
+    $direction = request('direction', 'asc');
+
+    // Added 'holder' to allowed sorts if you want to implement it later
+    $allowedSorts = ['asset_type', 'serial_number', 'status', 'purchase_date', 'days_in_stock'];
+    if (!in_array($sort, $allowedSorts)) {
+        $sort = 'serial_number';
     }
+
+    // CRITICAL: Added 'currentHolder.department.branch' and 'inspections' to with()
+    // This makes your Asset Inventory table load instantly.
+    $query = Asset::with([
+        'assetType', 
+        'currentHolder.department.branch', 
+        'inspections'
+    ]);
+
+    if ($sort === 'asset_type') {
+        $query->join('asset_types', 'assets.asset_type_id', '=', 'asset_types.id')
+              ->orderBy('asset_types.name', $direction)
+              ->select('assets.*');
+    } elseif ($sort === 'days_in_stock') {
+        // Optimized sorting for MySQL
+        $query->orderBy('purchase_date', $direction === 'asc' ? 'desc' : 'asc');
+    } else {
+        $query->orderBy($sort, $direction);
+    }
+
+    return $query->get();
+}
 
     private function getStagnantAssets(): Collection
     {
@@ -85,31 +119,6 @@ class DashboardService
             ->get()
             ->sortByDesc(fn (Asset $asset) => $asset->days_in_stock)
             ->values();
-    }
-
-    private function getAllAssets(): Collection
-    {
-        $sort = request('sort', 'serial_number');
-        $direction = request('direction', 'asc');
-
-        $allowedSorts = ['asset_type', 'serial_number', 'status', 'purchase_date', 'days_in_stock'];
-        if (!in_array($sort, $allowedSorts)) {
-            $sort = 'serial_number';
-        }
-
-        $query = Asset::with('assetType');
-
-        if ($sort === 'asset_type') {
-            $query->join('asset_types', 'assets.asset_type_id', '=', 'asset_types.id')
-                  ->orderBy('asset_types.name', $direction)
-                  ->select('assets.*');
-        } elseif ($sort === 'days_in_stock') {
-            $query->orderByRaw('DATEDIFF(NOW(), purchase_date) ' . $direction);
-        } else {
-            $query->orderBy($sort, $direction);
-        }
-
-        return $query->get();
     }
 
     private function getAssetTypeDistribution(): array

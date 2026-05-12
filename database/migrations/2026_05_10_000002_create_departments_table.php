@@ -11,8 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('inspections', function (Blueprint $table) {
-            $table->foreignId('inspected_by')->nullable()->change();
+        Schema::create('departments', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('branch_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->string('name');
+
+            $table->timestamps();
         });
     }
 
@@ -21,8 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('inspections', function (Blueprint $table) {
-            $table->foreignId('inspected_by')->nullable(false)->change();
-        });
+        Schema::dropIfExists('departments');
     }
 };

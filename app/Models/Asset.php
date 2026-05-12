@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class Asset extends Model
 {
@@ -25,6 +26,7 @@ class Asset extends Model
         'condition' => Condition::class,
     ];
 
+
     public function assetType(): BelongsTo
     {
         return $this->belongsTo(AssetType::class);
@@ -40,16 +42,22 @@ class Asset extends Model
         return $this->hasMany(Inspection::class);
     }
 
-    public function scopeIdle(Builder $query): Builder
+    public function currentHolder(): HasOneThrough
     {
-        return $query->whereDoesntHave('loans', function (Builder $query) {
-            $query->where('borrowed_at', '>=', now()->subYear());
-        });
+        return $this->hasOneThrough(
+            Employee::class,
+            Loan::class,
+            'asset_id',    // loans
+            'id',          // employees
+            'id',          // assets
+            'employee_id'  // loans
+        )->whereNull('loans.returned_at');
     }
 
-    public function isAvailable(): bool
+
+    public function getLatestNoteAttribute(): string
     {
-        return $this->status === AssetStatus::AVAILABLE;
+        return $this->inspections()->latest()->first()?->notes ?? 'No remarks';
     }
 
     public function getDaysInStockAttribute(): ?int
@@ -59,10 +67,6 @@ class Asset extends Model
             : null;
     }
 
-    /**
-     * Convert days_in_stock into a human-readable format (Years, Months, Days).
-     * This can be used globally across all reports.
-     */
     public function getIdleDurationAttribute(): array
     {
         $days = $this->days_in_stock;
@@ -76,5 +80,18 @@ class Asset extends Model
             'm' => floor(($days % 365) / 30),
             'd' => ($days % 365) % 30,
         ];
+    }
+
+
+    public function isAvailable(): bool
+    {
+        return $this->status === AssetStatus::AVAILABLE;
+    }
+
+    public function scopeIdle(Builder $query): Builder
+    {
+        return $query->whereDoesntHave('loans', function (Builder $query) {
+            $query->where('borrowed_at', '>=', now()->subYear());
+        });
     }
 }
